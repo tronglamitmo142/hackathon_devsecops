@@ -44,22 +44,11 @@ chmod +x install-zap.sh
 
 The application code is showed in the repository `app.py`  
 
-Clone source code from repository: `https://github.com/tronglamitmo142/hackathon_devsecops.git`  
+Clone source code from repository: `git clone https://github.com/tronglamitmo142/hackathon_devsecops.git`  
 
 The Dockerfile: `Dockerfile`
 
-## 3. Написать СI/СD Pipeline, который включает шаги:  
-## ·    	Сheckout SCM – выгрузка кода из вашего github/gitlab репозитория.  
-## ·    	SAST Scan (Semgrep) – проведение статического анализа исходного когда на уязвимости.  
-## ·    	SCA Scan (Dependency Check) – проведение сканирования зависимостей веб-приложения.  
-## ·    	Build – сборка веб-приложения через Dockerfile.  
-## ·    	Container Scanning (Trivy) – проведение сканирования компонентов в файловой системе образа контейнера.  
-## ·    	Publishing – экспорт собранного образа в public пространство DockerHub.  
-## ·    	Deployment – запуск полученного контейнера на хостовой машине.  
-## ·    	DAST Scanning (OWASP ZAP) – проведение динамического сканирования запущенного в контейнера Веб – приложения. 
-  
-### 1. Prerequires  
-**In this task, I used jenkins server as agent** 
+## 3. Написать СI/СD Pipeline
 
 Add global credentials in Jenkins:
 - Github credentials (for accesing to github repository):
@@ -95,4 +84,3 @@ Details:
   ![](images/Screenshot%202023-04-20%20at%2011.20.41.png)
 - [Container Scanning Report](./scanning_report/result.cdx)
 - [DAST report](./scanning_report/DAST_report.txt)
-
