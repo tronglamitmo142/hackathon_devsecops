@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-flask-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-flask-app
+  template:
+    metadata:
+      labels:
+        app: my-flask-app
+    spec:
+      securityContext:
+        fsGroup: 10000
+        seLinuxOptions:
+          level: "s0:c123,c456"
+      containers:
+      - name: my-flask-app
+        image: lamnt67/my-flask-app
+        securityContext:
+          runAsUser: 10000
+          runAsGroup: 10000
+          allowPrivilegeEscalation: false
+        ports:
+        - containerPort: 5000
