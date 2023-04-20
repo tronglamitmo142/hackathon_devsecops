@@ -141,9 +141,10 @@ kubectl apply -f deployment.yaml
 Verify:
 ![](./images/Screenshot%202023-04-20%20at%2018.42.02.png)
 
-Ingress Task: There are some problem with my EC2 machine, it can not rut ingress, tried different ways.
+Ingress Task:  
+There are some problem with my EC2 machine, it can not rut ingress, tried different ways.
 ![](./images/Screenshot%202023-04-20%20at%2019.48.48.png)
-So I tried to do this task in the another machine:
+So I tried to do this task in the another machine:  
 Install ingress
 ```bash
 minikube addons enable ingress
@@ -156,7 +157,7 @@ I run the nginx-ingress, so it will expose the application in port 80
 ```bash
 kubectl apply -f ingress.yaml
 ```
-Verify 
+Verify   
 ![](./images/Screenshot%202023-04-20%20at%2019.59.55.png)
 Address is ip of minikube node.
 Access to this ip and verify the ingress object
@@ -164,6 +165,6 @@ Access to this ip and verify the ingress object
 minikube ssh 
 curl localhost:80
 ```
-Result:
+Result:  
 ![](./images/Screenshot%202023-04-20%20at%2020.02.08.png)
 
