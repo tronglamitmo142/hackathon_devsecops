@@ -1,55 +1,98 @@
-1. Install Jenkins, SAST - Semgrep, SCA - Dependency Check, Container Scanning - Trivy, DAST - OWSAP ZAP 
+# Задание 1  
 
-Machine: Ubuntu 20.04 in AWS Cloud 
-1.1. Jenkins:
+## 1. Установить Jenkins, SAST – Semgrep, SCA – Dependency Check, Container Scanning – Trivy, DAST – OWASP ZAP.
+
+**Machine**: Ubuntu 22.04 in AWS Cloud   
+### 1.1. Jenkins:
 ```bash
-curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | sudo tee \
-  /usr/share/keyrings/jenkins-keyring.asc > /dev/null
-echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
-  https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
-  /etc/apt/sources.list.d/jenkins.list > /dev/null
-sudo apt-get update
-sudo apt-get install jenkins
+chmod +x install-jenkins.sh
+./install-jenkins.sh
+``` 
+![](images/Screenshot%202023-04-19%20at%2013.56.46.png)
+### 1.2. Semgrep 
+```bash
+chmod +x install-semgrep.sh 
+./install-semgrep.sh
 ```
-
-lamnt56
-1
-
-1.2. Semgrep 
+Warning: ` WARNING: The script semgrep is installed in '/home/ubuntu/.local/bin' which is not on PATH.`
+-> We should add this path to $PATH 
 ```bash
-python3 -m pip install semgrep
-semgrep --version
-```
-Exits the warning: ` WARNING: The script semgrep is installed in '/home/ubuntu/.local/bin' which is not on PATH.`
-We should add this path to $PATH 
-```bash
-sudo vi ~/.bashrc
+$ sudo vi ~/.bashrc
 export PATH="/home/ubuntu/.local/bin:$PATH"
-source ~/.bashrc
+$ source ~/.bashrc
 ```
-1.3. Dependency check
+### 1.3. Dependency check
 ```bash
-git clone --depth 1 https://github.com/jeremylong/DependencyCheck.git
-cd DependencyCheck
-mvn -s settings.xml install
-./cli/target/release/bin/dependency-check.sh -h
+$ git clone --depth 1 https://github.com/jeremylong/DependencyCheck.git
+$ cd DependencyCheck
+$ mvn -s settings.xml install
+$./cli/target/release/bin/dependency-check.sh -h
 $ ./cli/target/release/bin/dependency-check.sh --out . --scan ./src/test/resources
-
 ```
-1.4. Trivy 
+### 1.4. Trivy 
 
 ```bash
-sudo apt-get install wget apt-transport-https gnupg lsb-release
-wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
-echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main | sudo tee -a /etc/apt/sources.list.d/trivy.list
-sudo apt-get update
-sudo apt-get install trivy
+chmod +x install-trivy.sh
+./install-trivy.sh
 ```
 1.5. OWASP ZAP
 ```bash
-wget https://github.com/zaproxy/zaproxy/releases/download/v2.12.0/ZAP_2.12.0_Linux.tar.gz
-tar -xvf ZAP_2.12.0_Linux.tar.gz
+chmod +x install-zap.sh
+./install-zap.sh
 ```
+## 2. Разработать Dockerfile для сборки веб-приложения (код веб-сервиса можно взять из открытых источников, на любом из языков программирования). Использование приложений на микросервисной архитектуре – приветствуется. При разработке Dockerfile, необходимо ориентироваться на лучшие практики по безопасности: (например, https://sysdig.com/blog/dockerfile-best-practices/).
 
+The application code is showed in the repository `app.py`  
 
+Clone source code from repository: `https://github.com/tronglamitmo142/hackathon_devsecops.git`  
+
+The Dockerfile: `Dockerfile`
+
+## 3. Написать СI/СD Pipeline, который включает шаги:  
+## ·    	Сheckout SCM – выгрузка кода из вашего github/gitlab репозитория.  
+## ·    	SAST Scan (Semgrep) – проведение статического анализа исходного когда на уязвимости.  
+## ·    	SCA Scan (Dependency Check) – проведение сканирования зависимостей веб-приложения.  
+## ·    	Build – сборка веб-приложения через Dockerfile.  
+## ·    	Container Scanning (Trivy) – проведение сканирования компонентов в файловой системе образа контейнера.  
+## ·    	Publishing – экспорт собранного образа в public пространство DockerHub.  
+## ·    	Deployment – запуск полученного контейнера на хостовой машине.  
+## ·    	DAST Scanning (OWASP ZAP) – проведение динамического сканирования запущенного в контейнера Веб – приложения. 
+  
+### 1. Prerequires  
+**In this task, I used jenkins server as agent** 
+
+Add global credentials in Jenkins:
+- Github credentials (for accesing to github repository):
+![](./images/Screenshot%202023-04-20%20at%2010.55.41.png)
+- Install dependency-check plugin:
+  - Download the plugin
+  - Install the plugin 
+    ![](./images/Screenshot%202023-04-19%20at%2015.07.58.png)
+    ![](images/Screenshot%202023-04-20%20at%2010.57.38.png)
+- In Linux server:
+  - Install `docker`:  
+    ```bash
+    chmod +x install-docker.sh
+    ./install-docker.sh
+    ```
+  - Because when we run jenkins ci/cd pipeline, the user is jenkins, so we need to add jenkins to group docker, so we can use docker in jenkins without sudo permission
+    ```bash
+    usermod -a -G docker jenkins
+    ``` 
+  - add permision to jenkin suser in agent machine
+    ```bash
+    usermod -a -G root jenkins
+    ```
+### 1.2. Write Jenkinsfile
+Every stages is describe in Jenkinsfile 
+![](images/Screenshot%202023-04-20%20at%2011.05.50.png)
+Scanning result is showed in workspace directory and dashboard: 
+![](images/Screenshot%202023-04-20%20at%2011.16.24.png)
+
+Details: 
+- [SAST report](./scanning_report/SAST_report.txt)
+- SCA (dependency check):
+  ![](images/Screenshot%202023-04-20%20at%2011.20.41.png)
+- [Container Scanning Report](./scanning_report/result.cdx)
+- [DAST report](./scanning_report/DAST_report.txt)
 
